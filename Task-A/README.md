@@ -298,7 +298,7 @@ The frontend will be available at `http://localhost:8501`
 | Service  | URL                                           |
 |----------|-----------------------------------------------|
 | Backend  | `https://predusk-backend-ngpt.onrender.com`      |
-| Frontend | `https://predusk-api.streamlit.app`       |
+| Frontend | `https://my-api-predusk.streamlit.app`       |
 
 ### Render Deployment (Backend)
 
