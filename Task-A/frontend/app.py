@@ -9,11 +9,14 @@ import plotly.express as px
 from typing import Optional, Dict, List
 import os
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configuration
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "niweshsah")
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin123")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "hello123")
 
 # Page config
 st.set_page_config(

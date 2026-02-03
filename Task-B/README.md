@@ -6,7 +6,7 @@
 **Author:** Niwesh Sah  
 **Email:** sahniwesh@gmail.com  
 **Affiliation:** Indian Institute of Technology, Mandi  
-**Resume:** [View Resume](./resume.pdf)
+**Resume:** [View Resume](../resume.pdf)
 
 ---
 

@@ -11,3 +11,6 @@ env/
 *.db
 *.sqlite
 .DS_Store
+
+*.json
+update_database.py

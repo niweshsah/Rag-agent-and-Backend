@@ -1,627 +1,380 @@
-# 🚀 Me-API Playground
+# Me-API Playground
 
-A production-ready, live queryable resume/portfolio built with FastAPI, PostgreSQL, and Streamlit. This project acts as both a traditional portfolio and an interactive API that showcases your professional experience, projects, and skills.
-
-![Architecture](https://img.shields.io/badge/Architecture-Clean-blue)
-![Backend](https://img.shields.io/badge/Backend-FastAPI-009688)
-![Frontend](https://img.shields.io/badge/Frontend-Streamlit-FF4B4B)
-![Database](https://img.shields.io/badge/Database-PostgreSQL-336791)
-
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Quick Start](#-quick-start)
-- [Local Development](#-local-development)
-- [API Documentation](#-api-documentation)
-- [Deployment](#-deployment)
-- [Configuration](#-configuration)
-- [Project Structure](#-project-structure)
-- [Testing](#-testing)
-- [Contributing](#-contributing)
-
-## ✨ Features
-
-### Backend API
-- ✅ **RESTful API** with automatic OpenAPI documentation
-- ✅ **Full CRUD operations** on profile data
-- ✅ **Advanced filtering** for projects by skill and status
-- ✅ **Global search** across projects and work experience
-- ✅ **Skill analytics** with project count aggregation
-- ✅ **Basic Authentication** for protected endpoints
-- ✅ **CORS configuration** for cross-origin requests
-- ✅ **Error handling** for 404 and 500 errors
-- ✅ **Health checks** for monitoring
-
-### Frontend UI
-- ✅ **Interactive dashboard** with real-time data
-- ✅ **Search functionality** with live results
-- ✅ **Project filtering** by skills and status
-- ✅ **Skills visualization** with interactive charts
-- ✅ **Responsive design** with custom styling
-- ✅ **Multiple pages** for different content types
-
-### Database
-- ✅ **Normalized schema** with proper relationships
-- ✅ **SQLAlchemy ORM** for type-safe queries
-- ✅ **Automatic migrations** with Alembic support
-- ✅ **Seed data** for quick setup
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Client (Browser)                          │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Streamlit Frontend (Port 8501)                  │
-│  - Profile Dashboard                                         │
-│  - Project Portfolio                                         │
-│  - Skills Analytics                                          │
-│  - Search Interface                                          │
-└────────────────────────┬────────────────────────────────────┘
-                         │ HTTP/REST
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│               FastAPI Backend (Port 8000)                    │
-│  Routes:                                                     │
-│  • GET  /health          - Health check                      │
-│  • GET  /profile         - Get full profile                  │
-│  • PUT  /profile         - Update profile (Auth)             │
-│  • GET  /projects        - List/filter projects              │
-│  • GET  /skills/top      - Get top skills                    │
-│  • GET  /search          - Global search                     │
-└────────────────────────┬────────────────────────────────────┘
-                         │ SQLAlchemy ORM
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│            PostgreSQL Database (Port 5432)                   │
-│  Tables:                                                     │
-│  • profiles           • education                            │
-│  • work_experience    • projects                             │
-│  • skills             • social_links                         │
-│  • project_skills (junction table)                           │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## 🛠️ Tech Stack
-
-### Backend
-- **Framework:** FastAPI 0.109.0
-- **Database:** PostgreSQL 15+
-- **ORM:** SQLAlchemy 2.0.25
-- **Server:** Uvicorn with async support
-- **Authentication:** HTTP Basic Auth
-- **Validation:** Pydantic v2
-
-### Frontend
-- **Framework:** Streamlit 1.29.0
-- **HTTP Client:** Requests
-- **Visualization:** Plotly Express
-- **Data Processing:** Pandas
-
-### DevOps
-- **Containerization:** Docker & Docker Compose
-- **Deployment:** Render, Railway, or Fly.io
-- **Database Hosting:** Render PostgreSQL (Free tier)
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.11+
-- PostgreSQL 15+ (or use Docker)
-- Docker & Docker Compose (optional, recommended)
-
-### Option 1: Docker Compose (Recommended)
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd me-api-playground
-
-# Start all services
-docker-compose up -d
-
-# Initialize database and seed data
-docker-compose exec backend python seed.py
-
-# Access the application
-# Frontend: http://localhost:8501
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
-```
-
-### Option 2: Manual Setup
-
-```bash
-# 1. Setup PostgreSQL
-createdb me_api_db
-
-# 2. Setup Backend
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-
-# Copy and configure environment variables
-cp .env.example .env
-# Edit .env with your database credentials
-
-# Initialize database
-python seed.py
-
-# Run backend
-python main.py
-# Backend running at http://localhost:8000
-
-# 3. Setup Frontend (in new terminal)
-cd frontend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Configure environment
-export API_BASE_URL=http://localhost:8000
-export ADMIN_USERNAME=admin
-export ADMIN_PASSWORD=changeme123
-
-# Run frontend
-streamlit run app.py
-# Frontend running at http://localhost:8501
-```
-
-## 💻 Local Development
-
-### Backend Development
-
-```bash
-cd backend
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run with auto-reload
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-# Run tests (when implemented)
-pytest
-
-# Format code
-black .
-isort .
-```
-
-### Frontend Development
-
-```bash
-cd frontend
-
-# Activate virtual environment
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run Streamlit
-streamlit run app.py --server.port 8501
-
-# Streamlit will auto-reload on file changes
-```
-
-### Database Management
-
-```bash
-# Access PostgreSQL CLI
-psql me_api_db
-
-# Reset database
-dropdb me_api_db
-createdb me_api_db
-python backend/seed.py
-
-# Backup database
-pg_dump me_api_db > backup.sql
-
-# Restore database
-psql me_api_db < backup.sql
-```
-
-## 📚 API Documentation
-
-### Base URL
-- **Development:** `http://localhost:8000`
-- **Production:** `https://your-app.onrender.com`
-
-### Endpoints
-
-#### Health Check
-```bash
-GET /health
-
-Response:
-{
-  "status": "healthy",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "database": "connected",
-  "version": "1.0.0"
-}
-```
-
-#### Get Profile
-```bash
-GET /profile
-
-Response:
-{
-  "id": 1,
-  "name": "Your Name",
-  "email": "your.email@example.com",
-  "phone": "+1 (555) 123-4567",
-  "location": "San Francisco, CA",
-  "bio": "Full-Stack Engineer...",
-  "education": [...],
-  "work_experience": [...],
-  "projects": [...],
-  "skills": [...],
-  "social_links": [...]
-}
-```
-
-#### Update Profile (Requires Auth)
-```bash
-PUT /profile
-Authorization: Basic base64(username:password)
-Content-Type: application/json
-
-{
-  "name": "Updated Name",
-  "email": "new.email@example.com",
-  "bio": "Updated bio...",
-  "skills": [
-    {
-      "name": "Python",
-      "level": "expert",
-      "category": "backend",
-      "years_experience": 5.0
-    }
-  ]
-}
-```
-
-#### Get Projects (with filters)
-```bash
-# All projects
-GET /projects
-
-# Filter by skill
-GET /projects?skill=React
-
-# Filter by status
-GET /projects?status=completed
-
-# Combine filters
-GET /projects?skill=Python&status=in-progress
-```
-
-#### Get Top Skills
-```bash
-GET /skills/top?limit=10
-
-Response:
-[
-  {
-    "id": 1,
-    "name": "React",
-    "level": "expert",
-    "category": "frontend",
-    "years_experience": 4.0,
-    "project_count": 5
-  },
-  ...
-]
-```
-
-#### Search
-```bash
-GET /search?q=microservices
-
-Response:
-[
-  {
-    "type": "project",
-    "id": 1,
-    "title": "E-Commerce Platform",
-    "description": "Built with microservices architecture...",
-    "relevance_score": 1.5
-  },
-  ...
-]
-```
-
-### Authentication
-
-Protected endpoints require HTTP Basic Authentication:
-
-```bash
-# Using curl
-curl -X PUT http://localhost:8000/profile \
-  -u admin:changeme123 \
-  -H "Content-Type: application/json" \
-  -d '{"name": "New Name", "email": "new@example.com"}'
-
-# Using Python requests
-import requests
-from requests.auth import HTTPBasicAuth
-
-response = requests.put(
-    "http://localhost:8000/profile",
-    auth=HTTPBasicAuth("admin", "changeme123"),
-    json={"name": "New Name", "email": "new@example.com"}
-)
-```
-
-### Interactive Documentation
-
-FastAPI provides automatic interactive documentation:
-
-- **Swagger UI:** `http://localhost:8000/docs`
-- **ReDoc:** `http://localhost:8000/redoc`
-
-## 🌐 Deployment
-
-### Deploy to Render (Recommended)
-
-#### 1. Backend Deployment
-
-```bash
-# Create render.yaml in project root
-cat > render.yaml << 'EOF'
-services:
-  - type: web
-    name: me-api-backend
-    env: python
-    buildCommand: "cd backend && pip install -r requirements.txt"
-    startCommand: "cd backend && python seed.py && uvicorn main:app --host 0.0.0.0 --port $PORT"
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: me-api-db
-          property: connectionString
-      - key: ADMIN_USERNAME
-        value: admin
-      - key: ADMIN_PASSWORD
-        generateValue: true
-      - key: ALLOWED_ORIGINS
-        value: https://your-frontend.streamlit.app
-
-databases:
-  - name: me-api-db
-    databaseName: me_api_db
-    user: postgres
-EOF
-
-# Deploy to Render
-# 1. Push to GitHub
-# 2. Connect repository to Render
-# 3. Render will auto-deploy using render.yaml
-```
-
-#### 2. Frontend Deployment (Streamlit Cloud)
-
-```bash
-# 1. Push code to GitHub
-# 2. Go to https://share.streamlit.io
-# 3. Connect repository
-# 4. Set environment variables in Streamlit Cloud:
-#    - API_BASE_URL: https://your-backend.onrender.com
-#    - ADMIN_USERNAME: admin
-#    - ADMIN_PASSWORD: your-password
-# 5. Deploy
-```
-
-### Deploy to Railway
-
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login
-railway login
-
-# Initialize project
-railway init
-
-# Deploy backend
-cd backend
-railway up
-
-# Deploy frontend
-cd ../frontend
-railway up
-
-# Add PostgreSQL
-railway add --plugin postgresql
-```
-
-### Deploy to Fly.io
-
-```bash
-# Install Fly CLI
-curl -L https://fly.io/install.sh | sh
-
-# Login
-fly auth login
-
-# Deploy backend
-cd backend
-fly launch --name me-api-backend
-fly deploy
-
-# Deploy database
-fly postgres create --name me-api-db
-
-# Deploy frontend
-cd ../frontend
-fly launch --name me-api-frontend
-fly deploy
-```
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-#### Backend (.env)
-```bash
-# Database
-DATABASE_URL=postgresql://user:password@host:port/dbname
-
-# Authentication
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=secure_password_here
-
-# CORS
-ALLOWED_ORIGINS=http://localhost:8501,https://your-frontend.streamlit.app
-```
-
-#### Frontend
-```bash
-# API Configuration
-API_BASE_URL=http://localhost:8000  # or production URL
-
-# Authentication (for admin features)
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=secure_password_here
-```
-
-### Customizing Seed Data
-
-Edit `backend/seed.py` to update your profile information:
-
-```python
-# Update profile
-profile = Profile(
-    name="Your Name",
-    email="your.email@example.com",
-    phone="+1 (555) 123-4567",
-    location="Your City, State",
-    bio="Your professional bio..."
-)
-
-# Add your education
-education_data = [
-    Education(
-        institution="Your University",
-        degree="Your Degree",
-        field="Your Field",
-        # ... more fields
-    )
-]
-
-# Add your work experience
-# Add your projects
-# Add your skills
-```
-
-## 📁 Project Structure
-
-```
-me-api-playground/
-├── backend/
-│   ├── main.py              # FastAPI application
-│   ├── models.py            # SQLAlchemy models
-│   ├── schemas.py           # Pydantic schemas
-│   ├── database.py          # Database configuration
-│   ├── auth.py              # Authentication logic
-│   ├── seed.py              # Database seeding script
-│   ├── requirements.txt     # Python dependencies
-│   ├── Dockerfile           # Docker configuration
-│   └── .env.example         # Environment template
-├── frontend/
-│   ├── app.py               # Streamlit application
-│   ├── requirements.txt     # Python dependencies
-│   └── Dockerfile           # Docker configuration
-├── database/
-│   └── (migrations and backups)
-├── docker-compose.yml       # Multi-container setup
-├── ARCHITECTURE.md          # System architecture docs
-└── README.md                # This file
-```
-
-## 🧪 Testing
-
-### Backend Tests
-
-```bash
-cd backend
-pytest tests/ -v
-
-# Run with coverage
-pytest --cov=. tests/
-
-# Run specific test
-pytest tests/test_api.py::test_get_profile
-```
-
-### API Testing with curl
-
-```bash
-# Test health endpoint
-curl http://localhost:8000/health
-
-# Test profile endpoint
-curl http://localhost:8000/profile | jq
-
-# Test search
-curl "http://localhost:8000/search?q=react" | jq
-
-# Test authenticated endpoint
-curl -u admin:changeme123 -X PUT \
-  http://localhost:8000/profile \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Test", "email": "test@example.com"}'
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how to contribute:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Code Style
-
-- Backend: Follow PEP 8, use `black` and `isort`
-- Frontend: Follow PEP 8 for Python code
-- Write descriptive commit messages
-- Add docstrings to functions and classes
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- FastAPI for the amazing framework
-- Streamlit for rapid frontend development
-- PostgreSQL for reliable data storage
-- The open-source community
-
-## 📧 Contact
-
-**Your Name**
-- Email: your.email@example.com
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
+A live, queryable resume/portfolio REST API built with FastAPI, designed to expose personal profile data through a structured, type-safe API interface. This project includes a full-featured backend with CRUD operations and an interactive Streamlit frontend for visualization.
 
 ---
 
-**Built with ❤️ using FastAPI, PostgreSQL, and Streamlit**
+## Table of Contents
+
+- [Architecture](#architecture)
+- [Database Schema](#database-schema)
+- [API Endpoints](#api-endpoints)
+- [Local Setup](#local-setup)
+- [Deployment](#deployment)
+- [Sample cURL Commands](#sample-curl-commands)
+- [Authentication](#authentication)
+- [Limitations](#limitations)
+- [Future Improvements](#future-improvements)
+
+---
+
+## Architecture
+
+```
++-------------------+       +-------------------+       +-------------------+
+|                   |       |                   |       |                   |
+|  Streamlit UI     +------>+  FastAPI Backend  +------>+  PostgreSQL DB    |
+|  (Frontend)       |       |  (REST API)       |       |  (Data Layer)     |
+|  Port: 8501       |       |  Port: 8000       |       |  Port: 5432       |
+|                   |       |                   |       |                   |
++-------------------+       +-------------------+       +-------------------+
+```
+
+### Technology Stack
+
+| Layer      | Technology                          |
+|------------|-------------------------------------|
+| Backend    | FastAPI 0.109.0, Uvicorn            |
+| Database   | PostgreSQL, SQLAlchemy 2.0.25       |
+| ORM        | SQLAlchemy with Pydantic validation |
+| Frontend   | Streamlit 1.53.1, Plotly            |
+| Auth       | HTTP Basic Authentication           |
+| Deployment | Render (Backend), Streamlit Cloud   |
+
+### Key Design Decisions
+
+- **Single Profile Model**: The API is designed around a single user profile, making it ideal for personal portfolio use cases
+- **Relational Data Model**: Education, work experience, projects, skills, and social links are separate entities with foreign key relationships
+- **Many-to-Many Skills**: Projects can be associated with multiple skills through a junction table
+- **Basic Auth for Mutations**: Read operations are public; create, update, and delete operations require authentication
+
+---
+
+## Database Schema
+
+### Entity Relationship Diagram
+
+```
+profiles
+    |
+    +-- education (1:N)
+    |
+    +-- work_experience (1:N)
+    |
+    +-- skills (1:N) <----- project_skills (N:M) -----> projects (1:N)
+    |
+    +-- social_links (1:N)
+```
+
+### Table Definitions
+
+#### profiles
+| Column      | Type         | Constraints      |
+|-------------|--------------|------------------|
+| id          | INTEGER      | PRIMARY KEY      |
+| name        | VARCHAR(255) | NOT NULL         |
+| email       | VARCHAR(255) | NOT NULL, UNIQUE |
+| phone       | VARCHAR(50)  | NULLABLE         |
+| location    | VARCHAR(255) | NULLABLE         |
+| bio         | TEXT         | NULLABLE         |
+| created_at  | DATETIME     | DEFAULT NOW      |
+| updated_at  | DATETIME     | DEFAULT NOW      |
+
+#### education
+| Column      | Type         | Constraints                    |
+|-------------|--------------|--------------------------------|
+| id          | INTEGER      | PRIMARY KEY                    |
+| profile_id  | INTEGER      | FOREIGN KEY (profiles.id)      |
+| institution | VARCHAR(255) | NOT NULL                       |
+| degree      | VARCHAR(255) | NOT NULL                       |
+| field       | VARCHAR(255) | NULLABLE                       |
+| start_date  | VARCHAR(50)  | NULLABLE                       |
+| end_date    | VARCHAR(50)  | NULLABLE                       |
+| gpa         | FLOAT        | NULLABLE (0.0 - 4.0)           |
+| description | TEXT         | NULLABLE                       |
+
+#### work_experience
+| Column      | Type         | Constraints                    |
+|-------------|--------------|--------------------------------|
+| id          | INTEGER      | PRIMARY KEY                    |
+| profile_id  | INTEGER      | FOREIGN KEY (profiles.id)      |
+| company     | VARCHAR(255) | NOT NULL                       |
+| position    | VARCHAR(255) | NOT NULL                       |
+| description | TEXT         | NULLABLE                       |
+| start_date  | VARCHAR(50)  | NULLABLE                       |
+| end_date    | VARCHAR(50)  | NULLABLE                       |
+| is_current  | BOOLEAN      | DEFAULT FALSE                  |
+| location    | VARCHAR(255) | NULLABLE                       |
+
+#### skills
+| Column           | Type         | Constraints                    |
+|------------------|--------------|--------------------------------|
+| id               | INTEGER      | PRIMARY KEY                    |
+| profile_id       | INTEGER      | FOREIGN KEY (profiles.id)      |
+| name             | VARCHAR(255) | NOT NULL                       |
+| level            | VARCHAR(50)  | NULLABLE (beginner/intermediate/advanced/expert) |
+| category         | VARCHAR(100) | NULLABLE                       |
+| years_experience | FLOAT        | NULLABLE                       |
+
+#### projects
+| Column      | Type         | Constraints                    |
+|-------------|--------------|--------------------------------|
+| id          | INTEGER      | PRIMARY KEY                    |
+| profile_id  | INTEGER      | FOREIGN KEY (profiles.id)      |
+| name        | VARCHAR(255) | NOT NULL                       |
+| description | TEXT         | NULLABLE                       |
+| url         | VARCHAR(500) | NULLABLE                       |
+| github_url  | VARCHAR(500) | NULLABLE                       |
+| demo_url    | VARCHAR(500) | NULLABLE                       |
+| start_date  | VARCHAR(50)  | NULLABLE                       |
+| end_date    | VARCHAR(50)  | NULLABLE                       |
+| status      | VARCHAR(50)  | NULLABLE (completed/in-progress/archived) |
+
+#### social_links
+| Column     | Type         | Constraints                    |
+|------------|--------------|--------------------------------|
+| id         | INTEGER      | PRIMARY KEY                    |
+| profile_id | INTEGER      | FOREIGN KEY (profiles.id)      |
+| platform   | VARCHAR(100) | NOT NULL                       |
+| url        | VARCHAR(500) | NOT NULL                       |
+| icon       | VARCHAR(100) | NULLABLE                       |
+
+#### project_skills (Junction Table)
+| Column     | Type    | Constraints               |
+|------------|---------|---------------------------|
+| project_id | INTEGER | FOREIGN KEY (projects.id) |
+| skill_id   | INTEGER | FOREIGN KEY (skills.id)   |
+
+---
+
+## API Endpoints
+
+### System
+| Method | Endpoint  | Description           | Auth |
+|--------|-----------|----------------------|------|
+| GET    | /         | API root information | No   |
+| GET    | /health   | Health check status  | No   |
+| GET    | /docs     | Swagger UI           | No   |
+| GET    | /redoc    | ReDoc documentation  | No   |
+
+### Profile
+| Method | Endpoint  | Description          | Auth |
+|--------|-----------|---------------------|------|
+| GET    | /profile  | Get complete profile | No   |
+| POST   | /profile  | Create new profile   | Yes  |
+| PUT    | /profile  | Update profile       | Yes  |
+| DELETE | /profile  | Delete profile       | Yes  |
+
+### Education
+| Method | Endpoint              | Description              | Auth |
+|--------|-----------------------|-------------------------|------|
+| GET    | /education            | List all education      | No   |
+| POST   | /education            | Add education record    | Yes  |
+| PUT    | /education/{id}       | Update education record | Yes  |
+| DELETE | /education/{id}       | Delete education record | Yes  |
+
+### Work Experience
+| Method | Endpoint                 | Description                | Auth |
+|--------|--------------------------|---------------------------|------|
+| GET    | /work-experience         | List all work experience  | No   |
+| POST   | /work-experience         | Add work experience       | Yes  |
+| PUT    | /work-experience/{id}    | Update work experience    | Yes  |
+| DELETE | /work-experience/{id}    | Delete work experience    | Yes  |
+
+### Projects
+| Method | Endpoint         | Description                              | Auth |
+|--------|------------------|----------------------------------------|------|
+| GET    | /projects        | List projects (filter by skill/status) | No   |
+| GET    | /projects/{id}   | Get project by ID                      | No   |
+| POST   | /projects        | Create project                         | Yes  |
+| PUT    | /projects/{id}   | Update project                         | Yes  |
+| DELETE | /projects/{id}   | Delete project                         | Yes  |
+
+### Skills
+| Method | Endpoint       | Description                    | Auth |
+|--------|----------------|-------------------------------|------|
+| GET    | /skills        | List all skills               | No   |
+| GET    | /skills/top    | Get top skills by project count| No   |
+| POST   | /skills        | Add skill                     | Yes  |
+| PUT    | /skills/{id}   | Update skill                  | Yes  |
+| DELETE | /skills/{id}   | Delete skill                  | Yes  |
+
+### Social Links
+| Method | Endpoint            | Description         | Auth |
+|--------|---------------------|---------------------|------|
+| GET    | /social-links       | List all links      | No   |
+| POST   | /social-links       | Add social link     | Yes  |
+| PUT    | /social-links/{id}  | Update social link  | Yes  |
+| DELETE | /social-links/{id}  | Delete social link  | Yes  |
+
+### Search
+| Method | Endpoint     | Description                              | Auth |
+|--------|--------------|----------------------------------------|------|
+| GET    | /search?q=   | Search across projects and experience  | No   |
+
+---
+
+## Local Setup
+
+### Prerequisites
+
+- Python 3.10+
+- PostgreSQL 14+
+- pip or conda for package management
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd predusk/Task-A
+```
+
+### 2. Create Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r ../requirements.txt
+```
+
+### 4. Configure Environment Variables
+
+Create a `.env` file in the `backend/` directory:
+
+```env
+DATABASE_URL=postgresql://postgres:password@localhost:5432/me_api_db
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_secure_password
+ALLOWED_ORIGINS=http://localhost:8501,http://127.0.0.1:8501
+```
+
+### 5. Set Up PostgreSQL Database
+
+```bash
+# Create database
+createdb me_api_db
+
+# Or using psql
+psql -U postgres -c "CREATE DATABASE me_api_db;"
+```
+
+### 6. Run the Backend Server
+
+```bash
+cd backend
+python main.py
+```
+
+The API will be available at `http://localhost:8000`
+
+### 7. Seed the Database (Optional)
+
+```bash
+python seed.py
+```
+
+### 8. Run the Frontend
+
+In a separate terminal:
+
+```bash
+cd frontend
+streamlit run app.py
+```
+
+The frontend will be available at `http://localhost:8501`
+
+---
+
+## Deployment
+
+### Deployed URLs
+
+| Service  | URL                                           |
+|----------|-----------------------------------------------|
+| Backend  | `https://predusk-backend-ngpt.onrender.com`      |
+| Frontend | `https://predusk-api.streamlit.app`       |
+
+### Render Deployment (Backend)
+
+1. Create a new Web Service on Render
+2. Connect your GitHub repository
+3. Configure build settings:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `cd Task-A/backend && uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. Add environment variables:
+   - `DATABASE_URL`: Your PostgreSQL connection string
+   - `ADMIN_USERNAME`: Admin username
+   - `ADMIN_PASSWORD`: Admin password
+   - `ALLOWED_ORIGINS`: Comma-separated allowed origins
+
+### Streamlit Cloud Deployment (Frontend)
+
+1. Push your code to GitHub
+2. Go to share.streamlit.io
+3. Deploy the app pointing to `Task-A/frontend/app.py`
+4. Add secrets in the Streamlit dashboard:
+   - `API_BASE_URL`: Your deployed backend URL
+   - `ADMIN_USERNAME`: Admin username
+   - `ADMIN_PASSWORD`: Admin password
+
+---
+
+## Sample cURL Commands
+
+Base URL: `https://predusk-backend-ngpt.onrender.com`
+
+```bash
+# Public endpoints
+curl -X GET $BASE_URL/health
+curl -X GET $BASE_URL/profile
+curl -X GET "$BASE_URL/search?q=python"
+curl -X GET "$BASE_URL/projects?skill=python&status=completed"
+curl -X GET "$BASE_URL/skills/top?limit=5"
+
+# Authenticated endpoints (add -u admin:password)
+curl -X POST $BASE_URL/profile -u admin:pass -H "Content-Type: application/json" -d '{"name":"John","email":"john@example.com"}'
+curl -X POST $BASE_URL/education -u admin:pass -H "Content-Type: application/json" -d '{"institution":"MIT","degree":"B.S.","field":"CS"}'
+curl -X POST $BASE_URL/skills -u admin:pass -H "Content-Type: application/json" -d '{"name":"Python","level":"expert"}'
+curl -X DELETE $BASE_URL/profile -u admin:pass
+```
+
+---
+
+## Authentication
+
+HTTP Basic Authentication for all write operations (POST, PUT, DELETE).
+
+```bash
+curl -u username:password -X POST ...
+```
+
+Configure via environment variables: `ADMIN_USERNAME`, `ADMIN_PASSWORD`
+
+---
+
+## Limitations
+
+- **Single Profile** only (no multi-tenancy)
+- **Basic Auth** (use HTTPS in production)
+- **No Pagination** on list endpoints
+- **No File Uploads** for images/PDFs
+- **Basic Search** (SQL LIKE, no full-text)
+- **No Caching** or rate limiting
+- **Synchronous** database operations
+- **String Dates** (not proper DATE types)
+
+---
+
+## Future Improvements
+
+- JWT authentication & rate limiting
+- Pagination & full-text search
+- File uploads & Redis caching
+
+---

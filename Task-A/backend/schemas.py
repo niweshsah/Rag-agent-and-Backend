@@ -22,6 +22,16 @@ class EducationCreate(EducationBase):
     pass
 
 
+class EducationUpdate(BaseModel):
+    institution: Optional[str] = Field(None, min_length=1, max_length=255)
+    degree: Optional[str] = Field(None, min_length=1, max_length=255)
+    field: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    gpa: Optional[float] = Field(None, ge=0.0, le=4.0)
+    description: Optional[str] = None
+
+
 class EducationResponse(EducationBase):
     id: int
     
@@ -43,6 +53,16 @@ class WorkExperienceCreate(WorkExperienceBase):
     pass
 
 
+class WorkExperienceUpdate(BaseModel):
+    company: Optional[str] = Field(None, min_length=1, max_length=255)
+    position: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    is_current: Optional[bool] = None
+    location: Optional[str] = None
+
+
 class WorkExperienceResponse(WorkExperienceBase):
     id: int
     
@@ -59,6 +79,13 @@ class SkillBase(BaseModel):
 
 class SkillCreate(SkillBase):
     pass
+
+
+class SkillUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    level: Optional[str] = Field(None, pattern="^(beginner|intermediate|advanced|expert)$")
+    category: Optional[str] = None
+    years_experience: Optional[float] = Field(None, ge=0)
 
 
 class SkillResponse(SkillBase):
@@ -85,7 +112,19 @@ class ProjectBase(BaseModel):
 
 
 class ProjectCreate(ProjectBase):
-    skill_ids: List[int] = []  # List of skill IDs to associate
+    skill_ids: List[int] = []
+
+
+class ProjectUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
+    url: Optional[str] = None
+    github_url: Optional[str] = None
+    demo_url: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    status: Optional[str] = Field(None, pattern="^(completed|in-progress|archived)$")
+    skill_ids: Optional[List[int]] = None
 
 
 class ProjectResponse(ProjectBase):
@@ -104,6 +143,12 @@ class SocialLinkBase(BaseModel):
 
 class SocialLinkCreate(SocialLinkBase):
     pass
+
+
+class SocialLinkUpdate(BaseModel):
+    platform: Optional[str] = Field(None, min_length=1, max_length=100)
+    url: Optional[str] = Field(None, min_length=1, max_length=500)
+    icon: Optional[str] = None
 
 
 class SocialLinkResponse(SocialLinkBase):
@@ -152,7 +197,7 @@ class ProfileResponse(ProfileBase):
 
 # ===== Search Result Schema =====
 class SearchResult(BaseModel):
-    type: str  # "project" or "work_experience"
+    type: str
     id: int
     title: str
     description: Optional[str]

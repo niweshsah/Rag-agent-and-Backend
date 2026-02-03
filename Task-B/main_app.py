@@ -425,7 +425,7 @@ if raw_text and source_name and source_name != st.session_state.current_source:
             st.error(f"❌ Indexing failed: {e}")
 
 # --- MAIN: INTERFACE ---
-st.markdown("# 🧠 Mini RAG Pro")
+st.markdown("# 🧠 Mini RAG")
 st.markdown("### Intelligent Document Q&A System")
 
 # Status Indicator with custom styling
